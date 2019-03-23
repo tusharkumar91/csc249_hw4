@@ -101,12 +101,11 @@ class Decoder(nn.Module):
 
         emb = self.embed(captions)
         emb = self.word_vec_layer(emb)
-        print(emb.size())
-        print(features.unsqueeze(1).size())
-        h = torch.cat((features.unsqueeze(1), emb), 1)
-        outputs, (hn, cn) = self.lstm(h, states)
+        emb_visual = torch.cat((features.unsqueeze(1), emb), 1)
+        outputs, (hn, cn) = self.lstm(emb_visual, states)
+        outputs = self.linear(outputs)
         # do not change the following code
-        outputs =  pack_padded_sequence(outputs, lengths, batch_first=True)
+        outputs = pack_padded_sequence(outputs, lengths, batch_first=True)
         return outputs[0]
     
     def sample(self, features, states=None):
