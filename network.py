@@ -101,7 +101,9 @@ class Decoder(nn.Module):
 
         emb = self.embed(captions)
         emb = self.word_vec_layer(emb)
-        h = torch.cat((features, emb), 1)
+        print(emb.size())
+        print(features.unsqueeze(1).size())
+        h = torch.cat((features.unsqueeze(1), emb), 1)
         outputs, (hn, cn) = self.lstm(h, states)
         # do not change the following code
         outputs =  pack_padded_sequence(outputs, lengths, batch_first=True)
