@@ -23,12 +23,12 @@ class LSTMCell(nn.Module):
 
     def forward(self, x, hidden):
         hn, cn = hidden
-        ft = torch.nn.Sigmoid(self.f_linear(torch.cat(hn, x)))
-        it = torch.nn.Sigmoid(self.i_linear(torch.cat(hn, x)))
-        ct = torch.nn.Tanh(self.g_linear(torch.cat(hn, x)))
-        ot = torch.nn.Sigmoid(self.o_linear(torch.cat(hn, x)))
+        ft = torch.nn.Sigmoid()(self.f_linear(torch.cat((hn, x),1)))
+        it = torch.nn.Sigmoid()(self.i_linear(torch.cat((hn, x),1)))
+        ct = torch.nn.Tanh()(self.g_linear(torch.cat((hn, x),1)))
+        ot = torch.nn.Sigmoid()(self.o_linear(torch.cat((hn, x),1)))
         cn = cn * ft + it*ct
-        hn = ot * torch.nn.Tanh(cn)
+        hn = ot * torch.nn.Tanh()(cn)
         hidden = (hn, cn)
         return hidden
 
@@ -81,7 +81,7 @@ class Decoder(nn.Module):
         # TODO: when you use your implemented LSTM, please comment the following
         # line and uncomment the self.lstm = LSTM(embed_size, hidden_size)
         self.lstm = nn.LSTM(word_vec_size, hidden_size, num_layers, batch_first=True)
-        # self.lstm = LSTM(embed_size, hidden_size)
+        #self.lstm = LSTM(word_vec_size, hidden_size)
         self.linear = nn.Linear(hidden_size, vocab_size) # project the outputs from LSTM to vocabulary space
         self.max_seg_length = max_seq_length # max length of sentence used during inference
         
