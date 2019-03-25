@@ -71,17 +71,15 @@ class Encoder(nn.Module):
 
 
 class Decoder(nn.Module):
-    def __init__(self, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20, word_vec_size=256):
+    def __init__(self, embed_size, hidden_size, vocab_size, num_layers, max_seq_length=20):
         """Build the layers in the decoder."""
         super(Decoder, self).__init__()
         self.hidden_size = hidden_size
         self.embed = nn.Embedding(vocab_size, embed_size) # word embedding
-        self.word_vec_layer = nn.Sequential(nn.Linear(embed_size, word_vec_size),
-                                            nn.ReLU())
         # TODO: when you use your implemented LSTM, please comment the following
         # line and uncomment the self.lstm = LSTM(embed_size, hidden_size)
-        self.lstm = nn.LSTM(word_vec_size, hidden_size, num_layers, batch_first=True)
-        #self.lstm = LSTM(word_vec_size, hidden_size)
+        #self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
+        self.lstm = LSTM(embed_size, hidden_size)
         self.linear = nn.Linear(hidden_size, vocab_size) # project the outputs from LSTM to vocabulary space
         self.max_seg_length = max_seq_length # max length of sentence used during inference
         
@@ -100,7 +98,6 @@ class Decoder(nn.Module):
         # space for training with a cross-entropy loss function. 
 
         emb = self.embed(captions)
-        emb = self.word_vec_layer(emb)
         emb_visual = torch.cat((features.unsqueeze(1), emb), 1)
         outputs, (hn, cn) = self.lstm(emb_visual, states)
         outputs = self.linear(outputs)
